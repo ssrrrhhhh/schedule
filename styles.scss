@@ -1,0 +1,166 @@
+$main-color:  #68b7f3;
+$secondary-color: #ceefff;
+$background-color: #00aaff7b;
+$text-color: #000000;
+$table-width: 90%;
+$table-height: 60%;
+
+@use "sass:math";
+
+    
+@function calculate-position($percent) {//функция для вычисления позиции таблицы
+    $position-x: $table-width * ($percent / 100);
+    $position-y: $table-height * sin($percent * 0.0174533); // Приблизительное значение pi()/180
+    @return ($position-x, $position-y);
+}
+
+// анимация
+@keyframes open-table {
+    0% {
+        transform: translateX(0) translateY(-100%);
+    }
+
+    @for $i from 0 through 100 {
+        //цикл с 0 до 100 для максимально плавной анимации
+        $percent: $i / 100;
+        $pos: calculate-position($i);
+        $pos-x: nth($pos, 1);
+        $pos-y: nth($pos, 2);
+
+        #{percentage($percent)} {
+            transform: translateX($pos-x) translateY($pos-y);
+        }
+    }
+
+    100% {
+        $pos: calculate-position(100);
+        $pos-x: nth($pos, 1);
+        $pos-y: nth($pos, 2);
+        transform: translateX($pos-x) translateY($pos-y);
+    }
+}
+
+@mixin flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@mixin flex-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+   
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: $background-color;
+    color: $text-color;
+}
+
+.week {
+    @include flex-center();
+
+    &-column {
+        @include flex-column();
+        width: 50%;
+
+        &-btn-back {
+            display: none;
+            align-self: flex-start;
+            margin: 5px;
+        }
+
+        &-day {
+            margin-top: 5px;
+            width: 90%;
+
+            &-table {
+                display: none;
+                position: absolute;
+                border-style: outset;
+                border-width: 2px;
+                border-color: $main-color;
+                padding: 6px;
+                top: -20%;
+                left: -75%;
+                width: $table-width;
+                height: $table-height;
+                animation: open-table 1s forwards;
+                clip-path: polygon(0 0, 90% 0, 100% 100%, 0 100%); //использование clip-path
+
+                th,
+                td {
+                    border: 1px solid $secondary-color;
+                    padding: 2px;
+                }
+
+                th {
+                    background-color: $background-color;
+                    text-align: left;
+                }
+
+                tr:nth-child(even) {
+                    background-color: $secondary-color;
+                }
+
+                tr:hover {
+                    background-color: $secondary-color;
+                }
+            }
+
+            &-btn {
+                background-color: $main-color;
+                color: #ffffff;
+                border: 3px solid $main-color;
+                border-radius: 20px;
+                font-size: 16px;
+                padding: 20px 6px;
+                transition: all 0.8s ease;
+                display: block;
+            }
+
+            &-btn:hover {
+                text-decoration: none;
+                background-color: $secondary-color;
+                color: $text-color;
+                border-color: $main-color;
+                cursor: pointer;
+            }
+        }
+    }
+}
+
+.notifications {
+    display: block;
+
+    table {
+        border-style: outset;
+        border-width: 2px;
+        border-color: $main-color;
+
+        th,
+        td {
+            border: 1px solid $secondary-color;
+        }
+
+        th {
+            background-color: $background-color;
+            text-align: left;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .week-column {
+        width: 100%;
+    }
+}
+
